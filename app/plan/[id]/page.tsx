@@ -2,7 +2,9 @@ import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import PlanDetails from "./PlanDetails";
 
-async function PlanContent({ id }: { id: string }) {
+async function PlanContent({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+
   const supabase = await createClient();
 
   const {
@@ -40,20 +42,18 @@ async function PlanContent({ id }: { id: string }) {
   return <PlanDetails plan={plan} />;
 }
 
-export default async function PlanPage({
+export default function PlanPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
-
   return (
     <main className="min-h-screen bg-slate-950 p-6 text-white">
       <div className="mx-auto max-w-5xl">
         <Suspense
           fallback={<p className="text-slate-400">Loading event plan...</p>}
         >
-          <PlanContent id={id} />
+          <PlanContent params={params} />
         </Suspense>
       </div>
     </main>
