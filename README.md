@@ -195,4 +195,101 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 ### 4. Set up Supabase
 
-Create a table named `plans` in the Supabase SQL
+Create a table named `plans` in the Supabase SQL Editor:
+
+```sql
+create table public.plans (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  title text not null,
+  event_type text not null,
+  city text,
+  event_date date,
+  guest_count int,
+  budget numeric,
+  currency text default 'INR',
+  plan_data jsonb not null,
+  created_at timestamptz default now()
+);
+
+alter table public.plans enable row level security;
+
+create policy "Users can view their own plans"
+on public.plans for select
+using (auth.uid() = user_id);
+
+create policy "Users can insert their own plans"
+on public.plans for insert
+with check (auth.uid() = user_id);
+
+create policy "Users can update their own plans"
+on public.plans for update
+using (auth.uid() = user_id)
+with check (auth.uid() = user_id);
+
+create policy "Users can delete their own plans"
+on public.plans for delete
+using (auth.uid() = user_id);
+```
+
+### 5. Run locally
+
+```bash
+npm run dev
+```
+
+Open:
+
+```text
+http://localhost:3000
+```
+
+---
+
+## 📝 How to Use
+
+1. Open EventWise.
+2. Sign up using your email and password.
+3. Go to the dashboard.
+4. Click **+ New Plan**.
+5. Enter your event details.
+6. Click **Generate AI Plan**.
+7. Review the generated budget, timeline, vendors, ideas, risks, and schedule.
+8. Click **Save to My Dashboard**.
+9. Return anytime to view or delete saved plans.
+
+---
+
+## 🔐 Security
+
+- Passwords are handled securely by Supabase Auth.
+- Every plan is linked to the logged-in user’s `user_id`.
+- Supabase Row Level Security ensures users can access only their own plans.
+- API keys are stored as environment variables and are never exposed in the frontend.
+
+---
+
+## 🌟 Future Scope
+
+- AI-generated mood boards and invitation designs.
+- RSVP tracking and guest meal preferences.
+- Vendor quote comparison and payment tracking.
+- Collaborative planning for families and event committees.
+- WhatsApp sharing for checklists and schedules.
+- Location-aware vendor discovery.
+- Budget-vs-actual expense tracking.
+
+---
+
+## 👤 Author
+
+**Mohammed Muin Imran Sawant**  
+
+🔗 GitHub: [MasterCodes24](https://github.com/MasterCodes24)  
+🔗 LinkedIn: www.linkedin.com/in/mohammed-muin-i-sawant-2515b7397
+
+---
+
+## 📄 License
+
+This project was created for PromptWars.
